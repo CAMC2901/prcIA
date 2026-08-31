@@ -145,19 +145,23 @@ def is_gibberish(text: str) -> bool:
         vowel_count = sum(1 for char in cleaned if char in "aeiou")
         vowel_ratio = vowel_count / len(cleaned)
         
-        # Less than 15% vowels in a word of 4+ characters is almost certainly gibberish in Spanish/English
-        if vowel_ratio < 0.15:
+        # Less than 20% vowels in a word of 4+ characters is usually gibberish
+        if vowel_ratio < 0.20:
             return True
             
-        # 5 or more consecutive consonants without a vowel
+        # 4 or more consecutive consonants without a vowel is usually gibberish in Spanish
         consonants_streak = 0
         for char in cleaned:
             if char.isalpha() and char not in "aeiou":
                 consonants_streak += 1
-                if consonants_streak >= 5:
+                if consonants_streak >= 4:
                     return True
             else:
                 consonants_streak = 0
+
+    # Catch very short gibberish words with too many consonants (e.g., 'jjb')
+    if len(cleaned) == 3 and sum(1 for char in cleaned if char not in "aeiou") == 3:
+        return True
 
     return False
 
