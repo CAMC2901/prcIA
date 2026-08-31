@@ -46,7 +46,7 @@ async def metrics_endpoint():
 @app.get("/api/config")
 async def config_endpoint():
     return {
-        "escalation_form_url": os.getenv("ESCALATION_FORM_URL", "https://forms.gle/dummy_form_link")
+        "escalation_form_url": os.getenv("ESCALATION_FORM_URL", "https://docs.google.com/forms/d/e/1FAIpQLSdAyhhqdotfhe9bwKaCC0faNaArmJLSjQOmuD9feRl0pEd95A/viewform")
     }
 
 # Serve static frontend (if built)

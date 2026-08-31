@@ -13,6 +13,7 @@ from langchain_core.output_parsers import StrOutputParser
 
 from backend.services import cache_service, metrics_service
 from backend.mcp_tools import get_skills_instructions
+from backend.static_responses import get_static_response
 
 load_dotenv()
 
@@ -20,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "backend" / "data"
 
 ESCALATION_FLAG = "OUT_OF_SCOPE"
-ESCALATION_FORM_URL = os.getenv("ESCALATION_FORM_URL", "https://forms.gle/dummy_form_link")
+ESCALATION_FORM_URL = os.getenv("ESCALATION_FORM_URL", "https://docs.google.com/forms/d/e/1FAIpQLSdAyhhqdotfhe9bwKaCC0faNaArmJLSjQOmuD9feRl0pEd95A/viewform")
 ESCALATION_MESSAGE = f"Lo siento, no tengo esa información. Por favor, contáctanos a través de nuestro formulario y un asesor humano te ayudará: {ESCALATION_FORM_URL}"
 
 FEW_SHOT_EXAMPLES = """
@@ -130,7 +131,14 @@ class ChatEngine:
         return "\n\n".join(doc.page_content for doc in docs)
 
     def ask(self, question: str) -> str:
-        # Check Cache
+        # 1. Static Response Interception (0 tokens, 0 latency)
+        static_reply = get_static_response(question)
+        if static_reply:
+            metrics_service.record_cache_hit()
+            metrics_service.record_query()
+            return static_reply
+
+        # 2. Check Cache
         cached_response = cache_service.get(question)
         if cached_response:
             metrics_service.record_cache_hit()

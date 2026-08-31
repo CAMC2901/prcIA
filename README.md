@@ -1,84 +1,83 @@
-# 🌍 Horizon Academy - Asistente Virtual Inteligente (RAG Pipeline)
+# 🌍 Horizon Academy - Intelligent RAG Customer Service Assistant
 
-Este proyecto es un **Asistente Virtual IA completo para Horizon Academy**, diseñado con una arquitectura **RAG (Retrieval-Augmented Generation)**. Permite a la academia responder preguntas sobre precios, niveles, horarios y matrículas basándose estrictamente en sus documentos internos, evitando alucinaciones y proporcionando un flujo automático de escalamiento a soporte humano (Google Forms).
+An advanced AI-powered Customer Service Assistant designed for **Horizon Academy**, built using a **RAG (Retrieval-Augmented Generation)** architecture, **0-Token Static Interception Engine**, and **Custom Calculation Skills (MCP Standard)**.
 
----
-
-## 🛠️ Tecnologías Clave y su Función en el Proyecto
-
-### 1. **LangChain** (Orquestador Principal)
-- **¿Qué es?**: El framework central que conecta todos los componentes de Inteligencia Artificial.
-- **Función en el proyecto**:
-  - Lee los archivos de texto (`.txt`) de la carpeta `backend/data` con `TextLoader`.
-  - Divide los documentos en fragmentos óptimos con `RecursiveCharacterTextSplitter`.
-  - Gestiona la plantilla del prompt (`PromptTemplate`) y la cadena de ejecución (`chain = prompt | llm | parser`).
-  - Conecta la base de datos vectorial (`ChromaDB`) con los modelos de lenguaje (LLM).
-
-### 2. **HuggingFace** (Modelo de Vectorización / Embeddings)
-- **¿Qué es?**: Plataforma de modelos de IA de código abierto. Usamos el modelo `all-MiniLM-L6-v2`.
-- **Función en el proyecto**:
-  - Convierte el texto en español a números (vectores matemáticos de alta dimensión).
-  - Funciona **100% local y gratis**, eliminando la necesidad de pagar APIs externas solo para procesar y buscar en los documentos.
-
-### 3. **ChromaDB** (Base de Datos Vectorial)
-- **¿Dónde se guarda o dónde se ve?**:
-  - Se guarda automáticamente en el directorio de tu proyecto dentro de la carpeta **`chroma_db/`**.
-  - Ahí se almacenan los archivos `.sqlite3` e índices vectoriales donde residen los fragmentos codificados de tus documentos de texto.
-- **Función en el proyecto**:
-  - Almacena los vectores generados por HuggingFace.
-  - Cuando el usuario hace una pregunta, ChromaDB busca por similitud matemática los 10 fragmentos de texto más relevantes y se los entrega al modelo de IA como "Contexto".
-
-### 4. **Google Gemini 2.5 Flash** (LLM Principal)
-- **¿Qué es?**: El modelo de lenguaje avanzado de Google.
-- **Función en el proyecto**: Recibe el contexto encontrado por ChromaDB y redacta una respuesta coherente y amable al usuario.
-
-### 5. **Ollama (llama3)** (LLM de Respaldo / Fallback)
-- **¿Qué es?**: Un ejecutor de modelos de IA locales.
-- **Función en el proyecto**: Si la API Key de Gemini no funciona, está agotada o no responde, el sistema intercepta el error automáticamente y pasa la consulta a **Ollama (`llama3`)** localmente, garantizando que el asistente **nunca deje de responder**.
+It automatically answers frequently asked questions regarding prices, course levels, schedules, discounts, and enrollments based strictly on official business documentation, eliminating hallucinations and providing a human escalation flow via Google Forms.
 
 ---
 
-## 📐 Estructura del Proyecto
+## 🛠️ Key Architectural Components
+
+### 1. **0-Token Static Response Engine (`backend/static_responses.py`)**
+- Intercepts common user queries (greetings, schedule issues, human advisor requests, payment methods, placement tests, certificates, locations).
+- Delivers instant answers in **0 milliseconds with ZERO token consumption**, drastically reducing API costs and latency.
+
+### 2. **Custom Calculation Skills / MCP Standard (`backend/mcp_tools.py`)**
+- Provides dynamic mathematical capabilities for complex academic business rules:
+  - **`calculate_tuition_fee`**: Automatically computes module costs ($480k COP), registration fees ($60k COP), 10% Trimodular package discounts (for 3+ modules), and 5% Early Bird discounts.
+  - **`calculate_placement_test_recommendation`**: Evaluates placement test scores (0-100 pts) and recommends the exact starting MCER level, required modules, and pedagogical advice.
+  - **`calculate_total_course_hours`**: Calculates guided classroom hours (40h/module) and 24/7 self-study platform hours (20h/module) for any level or full program.
+  - **`calculate_installment_plan`**: Computes 2-part or 3-part flexible bimestral payment plans for students paying per module.
+
+### 3. **LangChain & RAG Pipeline (`backend/rag.py`)**
+- Loads business text documents from `backend/data/` using `TextLoader`.
+- Splits text into optimal chunks with `RecursiveCharacterTextSplitter` (chunk size: 500, overlap: 100).
+- Manages strict system prompts (`PromptTemplate`) and few-shot examples.
+
+### 4. **HuggingFace Embeddings (`all-MiniLM-L6-v2`)**
+- Converts Spanish text into mathematical vector embeddings **100% locally and free of charge**.
+
+### 5. **ChromaDB Vector Database (`chroma_db/`)**
+- Local persistent vector store in the project root directory. Performs fast semantic similarity searches to retrieve the top 10 relevant document chunks per query.
+
+### 6. **Google Gemini 2.5 Flash & Ollama Fallback**
+- Primary LLM: **Google Gemini 2.5 Flash** (`gemini-2.5-flash`).
+- Automatic Fallback: Seamlessly switches to a local **Ollama (`llama3`)** instance if Gemini API key fails or network is offline.
+
+---
+
+## 📁 Repository Structure
 
 ```text
 prueba-ai/
 ├── backend/
-│   ├── data/                 # Documentos oficiales (.txt) con precios, horarios y niveles
-│   ├── main.py               # Servidor FastAPI (Endpoints /api/chat, /api/metrics, /api/config)
-│   ├── rag.py                # Pipeline RAG (LangChain + ChromaDB + Gemini/Ollama)
-│   ├── services.py           # Servicios de caché y métricas en vivo
-│   └── requirements.txt      # Dependencias de Python
+│   ├── data/                 # Business documentation (.txt files)
+│   ├── main.py               # FastAPI server (/api/chat, /api/metrics, /api/config)
+│   ├── rag.py                # RAG Pipeline (LangChain + ChromaDB + Gemini/Ollama)
+│   ├── static_responses.py   # 0-Token Interception Engine for common FAQs & support
+│   ├── mcp_tools.py          # Custom calculation skills & MCP tools
+│   ├── services.py           # In-memory Cache & Live Metrics Service
+│   └── requirements.txt      # Python dependencies
 ├── frontend/
-│   ├── index.html            # Landing page interactiva de la academia + Interfaz de chat
-│   ├── style.css             # Estilos corporativos en Azul y Blanco + Animaciones
-│   └── main.js               # Lógica de cliente, transiciones SPA y comunicación API
-├── chroma_db/                # Base de datos vectorial persistida en disco (creada automáticamente)
-├── .env                      # Variables de entorno (API Keys, URLs)
-├── .env.example              # Plantilla de variables de entorno
-└── README.md                 # Guía de documentación
+│   ├── index.html            # Academy Landing Page + Clean Chat UI
+│   ├── style.css             # White & Corporate Blue Theme + CSS Animations
+│   └── main.js               # SPA logic, typing animations, REST API calls
+├── chroma_db/                # Local Vector Database directory (persisted)
+├── workflow_n8n.json         # Exported n8n automation workflow
+├── .env.example              # Environment variables template
+├── .gitignore                # Git secret protection
+└── README.md                 # Technical documentation
 ```
 
 ---
 
-## 🚀 Guía de Instalación y Ejecución Paso a Paso
+## 🚀 Setup & Execution Guide
 
-Cualquier persona puede clonar e iniciar este proyecto siguiendo estos pasos:
-
-### 1. Requisitos Previos
-- **Python 3.9+** instalado.
-- **Node.js 18+** y `npm` instalados.
-- *(Opcional)* **Ollama** instalado con el modelo llama3 (`ollama pull llama3`) para funcionamiento offline/fallback.
+### Prerequisites
+- **Python 3.9+**
+- **Node.js 18+** & `npm`
+- *(Optional)* **Ollama** installed with `llama3` (`ollama pull llama3`) for offline fallback.
 
 ---
 
-### 2. Configurar el Backend (Python)
+### 1. Backend Setup (Python FastAPI)
 
-1. Abre una terminal en la raíz del proyecto y crea un entorno virtual:
+1. Open a terminal in the project root and create a virtual environment:
    ```bash
    python -m venv venv
    ```
 
-2. Activa el entorno virtual:
+2. Activate the virtual environment:
    - **Linux / macOS**:
      ```bash
      source venv/bin/activate
@@ -88,57 +87,55 @@ Cualquier persona puede clonar e iniciar este proyecto siguiendo estos pasos:
      venv\Scripts\activate
      ```
 
-3. Instala todas las dependencias requeridas:
+3. Install required Python packages:
    ```bash
    pip install -r backend/requirements.txt
    ```
 
-4. Configura el archivo de variables de entorno:
+4. Create and configure environment variables:
    ```bash
    cp .env.example .env
    ```
-   Abre `.env` y asigna tus valores:
+   Edit `.env` with your credentials:
    ```env
-   GEMINI_API_KEY=tu_api_key_de_gemini
+   GEMINI_API_KEY=your_gemini_api_key_here
    OLLAMA_BASE_URL=http://localhost:11434
    OLLAMA_MODEL=llama3
-   ESCALATION_FORM_URL=https://docs.google.com/forms/d/...
+   ESCALATION_FORM_URL=https://docs.google.com/forms/d/e/1FAIpQLSdAyhhqdotfhe9bwKaCC0faNaArmJLSjQOmuD9feRl0pEd95A/viewform
    ```
 
 ---
 
-### 3. Configurar el Frontend (Vite / Vanilla JS)
+### 2. Frontend Setup (Vite / Vanilla JS)
 
-En una segunda terminal, instala las dependencias del frontend:
+In a second terminal, install frontend dependencies:
 ```bash
 npm install
 ```
 
 ---
 
-### 4. Iniciar los Servidores
+### 3. Running the Application
 
-Debes tener ambos servidores ejecutándose simultáneamente:
+Start both servers concurrently:
 
-#### **Terminal 1: Servidor Backend (FastAPI)**
+#### **Terminal 1: Backend Server**
 ```bash
 source venv/bin/activate
 uvicorn backend.main:app --host 0.0.0.0 --port 3000 --reload
 ```
-*El backend escuchará en `http://localhost:3000`.*
+*Backend API runs at `http://localhost:3000`.*
 
-#### **Terminal 2: Servidor Frontend (Vite)**
+#### **Terminal 2: Frontend Web App**
 ```bash
 npm run dev
 ```
-*El frontend se abrirá en `http://localhost:5173`.*
+*Frontend runs at `http://localhost:5173`.*
 
 ---
 
-## 💡 Funcionalidades Destacadas
+## 📊 Live Metrics & Cost Optimization
 
-1. **Landing Page Corporativa de Horizon Academy**: Página institucional completa en Azul y Blanco con menú de navegación, héroe descriptivo y llamado a la acción.
-2. **Asistente Virtual RAG**: Responde preguntas estrictamente basadas en la documentación real de la academia sin inventar información.
-3. **Animación de Escritura ("Typing Indicator")**: Animación de tres puntos rebotando mientras el bot procesa la respuesta.
-4. **Sistema de Escalamiento a Google Forms**: Si la pregunta está fuera del alcance de la documentación, el bot devuelve un mensaje cordial y habilita el botón de escalamiento a soporte humano.
-5. **Métricas en Vivo**: Panel que registra en tiempo real las consultas procesadas, aciertos en caché, tasa de escalamientos y costos estimados.
+- **0-Token Cost Savings**: Intercepts greetings, support requests, and schedule questions directly without consuming LLM tokens.
+- **In-Memory Cache**: Serves repeated queries instantly.
+- **Real-Time Dashboard**: Tracks processed queries, cache hit rates, escalation rates, and estimated USD cost live on the frontend interface.
