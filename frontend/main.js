@@ -114,6 +114,13 @@ chatForm.addEventListener('submit', async (e) => {
 
 // Initial setup
 async function initializeApp() {
+  // Reset metrics on page reload so each session starts fresh
+  try {
+    await fetch('/api/metrics/reset', { method: 'POST' });
+  } catch (err) {
+    console.error('Failed to reset metrics:', err);
+  }
+
   updateMetrics();
   metricsInterval = setInterval(updateMetrics, 10000); // Update every 10 seconds
 

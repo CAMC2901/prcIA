@@ -43,6 +43,11 @@ async def chat_endpoint(req: ChatRequest):
 async def metrics_endpoint():
     return metrics_service.get_metrics()
 
+@app.post("/api/metrics/reset")
+async def reset_metrics_endpoint():
+    metrics_service.reset()
+    return {"status": "success", "message": "Metrics reset successfully"}
+
 @app.get("/api/config")
 async def config_endpoint():
     return {

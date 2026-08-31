@@ -34,6 +34,12 @@ class MetricsService:
     def record_tokens(self, input_tokens: int = 0, output_tokens: int = 0):
         self.total_cost_usd += (input_tokens * self.cost_per_input_token) + (output_tokens * self.cost_per_output_token)
 
+    def reset(self):
+        self.processed_queries = 0
+        self.escalated_queries = 0
+        self.cache_hits = 0
+        self.total_cost_usd = 0.0
+
     def get_metrics(self) -> dict:
         escalation_rate = (self.escalated_queries / self.processed_queries) if self.processed_queries > 0 else 0.0
         return {

@@ -12,17 +12,32 @@ ESCALATION_FORM_URL = os.getenv("ESCALATION_FORM_URL", "https://docs.google.com/
 GIBBERISH_RESPONSE = "No he podido entender tu mensaje. 🧐 Por favor, escribe tu consulta de forma clara sobre nuestros cursos de idiomas (Inglés, Francés, Alemán, Italiano), precios, horarios o matrículas."
 
 STATIC_RULES = [
-    # 1. SPECIFIC INTENT: LANGUAGES OFFERED & METHODOLOGY
+    # 1. SPECIFIC INTENT: PRICES, COSTS & TUITION FEES
+    {
+        "keywords": ["precio", "precios", "cuanto cuesta", "cuanto vale", "costo", "costos", "tarifas", "cuanto es la matricula", "valor del modulo", "mensualidad", "cuanto vale el modulo"],
+        "response": "Nuestras tarifas en **Horizon Academy** son:\n- **Matrícula inicial**: $60.000 COP (pago único por programa).\n- **Módulo bimestral (2 meses)**: $480.000 COP.\n- **Material digital y plataforma**: ¡100% Incluido sin costo adicional!\n- **Descuentos**: 5% por pronto pago o 10% por paquete trimodular (3 módulos por adelantado)."
+    },
+    # 2. SPECIFIC INTENT: SCHEDULES & TIMETABLES
+    {
+        "keywords": ["horario", "horarios", "que horarios", "franjas horarias", "dias de clase", "sabados", "sabatinos", "en la noche", "en la manana", "en la tarde"],
+        "response": "Contamos con amplias franjas horarias adaptadas a tu tiempo:\n- **Plan Regular (Lunes a Jueves - 2h/día)**:\n  • Mañana: 6:00 AM - 8:00 AM\n  • Tarde: 2:00 PM - 4:00 PM\n  • Noche: 6:00 PM - 8:00 PM y 8:00 PM - 10:00 PM\n- **Plan Sabatino Intensivo (Sábados)**: 8:00 AM a 1:00 PM."
+    },
+    # 3. SPECIFIC INTENT: COURSES, PROGRAMS & LEVELS
+    {
+        "keywords": ["programas", "cursos", "niveles", "mcer", "a1", "a2", "b1", "b2", "c1", "cuantos niveles"],
+        "response": "Ofrecemos programas en **Inglés, Francés, Alemán e Italiano** estructurados según el MCER:\n- **Nivel A1** (Principiante): 4 meses\n- **Nivel A2** (Básico): 4 meses\n- **Nivel B1** (Intermedio): 6 meses\n- **Nivel B2** (Intermedio Alto): 6 meses\n- **Nivel C1** (Avanzado): 4 meses\nCada módulo bimestral consta de 40 horas lectivas guiadas con profesor en vivo."
+    },
+    # 4. SPECIFIC INTENT: LANGUAGES OFFERED & METHODOLOGY
     {
         "keywords": ["idiomas", "dictan", "ensenan", "enseñan", "ingles", "frances", "aleman", "italiano", "lenguas", "metodologia", "ofrecen"],
         "response": "En **Horizon Academy** enseñamos **Inglés, Francés, Alemán e Italiano** con metodología 100% enfocada en conversación, clases en vivo con profesores expertos y contenido digital alineado al MCER."
     },
-    # 2. SPECIFIC INTENT: IDENTITY & NAME QUESTIONS
+    # 5. SPECIFIC INTENT: IDENTITY & NAME QUESTIONS
     {
         "keywords": ["como te llamas", "quien eres", "cual es tu nombre", "quien es usted", "presentate", "que eres"],
         "response": "¡Hola! Soy **Horizon**, el asistente virtual inteligente de **Horizon Academy**. Estoy aquí para ayudarte con toda la información sobre nuestros programas de idiomas, precios, horarios y matrículas."
     },
-    # 3. SPECIFIC INTENT: QUESTION OPENINGS & DOUBTS ("una pregunta", "tengo una duda")
+    # 6. SPECIFIC INTENT: QUESTION OPENINGS & DOUBTS ("una pregunta", "tengo una duda")
     {
         "keywords": [
             "una pregunta", "tengo una duda", "una duda", "tengo una pregunta", 
@@ -31,62 +46,62 @@ STATIC_RULES = [
         ],
         "response": "¡Claro que sí! Dime cuál es tu duda o pregunta y con mucho gusto te brindaré toda la información sobre nuestros cursos, horarios, precios o matrículas."
     },
-    # 4. SPECIFIC INTENT: HISTORY, EXPERIENCE & YEARS
+    # 7. SPECIFIC INTENT: HISTORY, EXPERIENCE & YEARS
     {
         "keywords": ["hace cuanto", "cuantos anos", "cuantos años", "cuantos anos llevan", "cuantos años llevan", "trayectoria", "fundacion", "cuanto tiempo llevan", "historia de la academia", "experiencia"],
-        "response": "Horizon Academy cuenta con más de 10 años de experiencia e innovación educativa en Colombia, forming miles de estudiantes y profesionales con certificaciones internacionales."
+        "response": "Horizon Academy cuenta con más de 10 años de experiencia e innovación educativa en Colombia, formando miles de estudiantes y profesionales con certificaciones internacionales."
     },
-    # 5. SPECIFIC INTENT: HUMAN ASSISTANCE & DIRECT CONTACT
+    # 8. SPECIFIC INTENT: HUMAN ASSISTANCE & DIRECT CONTACT
     {
         "keywords": ["humano", "asesor", "persona", "agente", "hablar con alguien", "atencion al cliente", "soporte humano", "hablar con un asesor"],
         "response": f"¡Por supuesto! Si deseas hablar directamente con un asesor humano de Horizon Academy, por favor diligencia nuestro formulario oficial aquí: {ESCALATION_FORM_URL}"
     },
-    # 6. SPECIFIC INTENT: SCHEDULE PROBLEMS & CHANGES
+    # 9. SPECIFIC INTENT: SCHEDULE PROBLEMS & CHANGES
     {
         "keywords": ["problema con el horario", "problema de horario", "cambiar de horario", "cambio de horario", "cruce de horario", "cruce de clases", "no puedo asistir", "reposicion de clase", "falte a clase", "perdi una clase"],
         "response": "Si presentas un cruce de horario o requieres cambiarte de grupo, debes enviar una solicitud formal a la secretaría académica a través de nuestro formulario de soporte: " + ESCALATION_FORM_URL + ". Los cambios se aprueban según disponibilidad de cupo en la primera semana de cada módulo."
     },
-    # 7. SPECIFIC INTENT: PAYMENTS, BILLING & REFUNDS
+    # 10. SPECIFIC INTENT: PAYMENTS, BILLING & REFUNDS
     {
         "keywords": ["devolucion", "reembolso", "problema con el pago", "error de pago", "factura electronica", "metodo de pago", "transferencia no refleja", "medios de pago", "PSE", "tarjeta de credito"],
         "response": "Para dudas sobre transacciones, medios de pago (PSE, tarjeta, transferencia), facturación electrónica o solicitudes de reembolso, ponte en contacto con nuestro departamento de cartera aquí: " + ESCALATION_FORM_URL
     },
-    # 8. SPECIFIC INTENT: PLACEMENT TESTS & EVALUATIONS
+    # 11. SPECIFIC INTENT: PLACEMENT TESTS & EVALUATIONS
     {
         "keywords": ["examen de clasificacion", "prueba de nivel", "saber mi nivel", "homologacion", "evaluacion inicial", "nivelamento"],
         "response": "Realizamos exámenes de clasificación online y presenciales para evaluar tu nivel actual (A1 a C1). Si tienes conocimientos previos, puedes agendar tu examen comunicándote por nuestro formulario: " + ESCALATION_FORM_URL
     },
-    # 9. SPECIFIC INTENT: CERTIFICATES & DIPLOMAS
+    # 12. SPECIFIC INTENT: CERTIFICATES & DIPLOMAS
     {
         "keywords": ["certificado", "diploma", "constancia de estudio", "certificado de notas", "descargar certificado", "certificacion mcer"],
         "response": "Los certificados de nivel (alineados al Marco Común Europeo MCER) se expiden al finalizar y aprobar los módulos correspondientes. Si necesitas una constancia de estudio vigente, solicítala mediante nuestro formulario: " + ESCALATION_FORM_URL
     },
-    # 10. SPECIFIC INTENT: REQUIREMENTS & REGISTRATION PROCESS
+    # 13. SPECIFIC INTENT: REQUIREMENTS & REGISTRATION PROCESS
     {
         "keywords": ["requisitos para inscribirme", "como me inscribo", "proceso de matricula", "documentos para ingresar", "como matricularme"],
         "response": "Para inscribirte solo necesitas tu documento de identidad y diligenciar el formulario de matrícula. No requerimos conocimientos previos para el Nivel A1. ¡Puedes matricularte directamente o solicitar asesoría personalizada aquí: " + ESCALATION_FORM_URL + "!"
     },
-    # 11. SPECIFIC INTENT: MODALITIES (ONLINE VS PRESENCIAL)
+    # 14. SPECIFIC INTENT: MODALITIES (ONLINE VS PRESENCIAL)
     {
         "keywords": ["modalidad", "virtual o presencial", "clases online", "clases virtuales", "remoto", "en vivo"],
         "response": "Contamos con dos modalidades totalmente equivalentes: **Virtual En Vivo** (vía plataforma interactiva con profesor en directo) y **Presencial** en nuestras sedes. Ambas modalidades incluyen el mismo material digital y certificación."
     },
-    # 12. SPECIFIC INTENT: CORPORATE & GROUP PLANS
+    # 15. SPECIFIC INTENT: CORPORATE & GROUP PLANS
     {
         "keywords": ["empresas", "planes corporativos", "descuento para empresas", "grupos empresariales", "capacitacion empresarial"],
         "response": "Ofrecemos planes de formación lingüística para empresas con flexibilidad de horarios e informes de progreso para gestión de talento humano. Solicita una propuesta corporativa mediante nuestro formulario: " + ESCALATION_FORM_URL
     },
-    # 13. SPECIFIC INTENT: LOCATION & PHYSICAL CAMPUS
+    # 16. SPECIFIC INTENT: LOCATION & PHYSICAL CAMPUS
     {
         "keywords": ["ubicacion", "direccion", "donde quedan", "donde estan ubicados", "sede principal", "parqueadero"],
         "response": "Nuestra sede principal de Horizon Academy cuenta con instalaciones modernas, aulas con pantallas interactivas y parqueadero para estudiantes. Para atención presencial, comunícate previamente en secretaría."
     },
-    # 14. GENERAL GREETINGS & PLEASANTRIES (Fallback for standalone greetings)
+    # 17. GENERAL GREETINGS & PLEASANTRIES (Fallback for standalone greetings)
     {
         "keywords": ["hola", "buenas", "buenos dias", "buenas tardes", "buenas noches", "hey", "saludos", "que tal", "inicio"],
         "response": "¡Hola! Bienvenid@ a **Horizon Academy**. 🌍 Soy tu asistente virtual inteligente. ¿En qué te puedo ayudar hoy? Puedes preguntarme sobre precios, programas de idiomas, horarios, certificados o formas de pago."
     },
-    # 15. THANKS & FAREWELLS
+    # 18. THANKS & FAREWELLS
     {
         "keywords": ["gracias", "muchas gracias", "chao", "adios", "hasta luego", "excelente gracias", "vale gracias", "ok gracias"],
         "response": "¡Con mucho gusto! 😊 Estamos para servirte en Horizon Academy. ¡Que tengas un excelente día!"
