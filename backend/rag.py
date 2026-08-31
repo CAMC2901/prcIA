@@ -72,17 +72,27 @@ class ChatEngine:
         self.prompt = PromptTemplate.from_template(SYSTEM_PROMPT)
 
     def _initialize_llm(self):
+        openai_key = os.getenv("OPENAI_API_KEY")
         gemini_key = os.getenv("GEMINI_API_KEY")
+
+        if openai_key:
+            print("ChatEngine: Initializing ChatOpenAI (gpt-4o-mini)")
+            try:
+                from langchain_openai import ChatOpenAI
+                return ChatOpenAI(model="gpt-4o-mini", temperature=0.1, api_key=openai_key)
+            except Exception as e:
+                print(f"Failed to load ChatOpenAI ({e}). Trying Gemini...")
+
         if gemini_key:
             print("ChatEngine: Initializing ChatGoogleGenerativeAI (Gemini 2.5 Flash)")
             return ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.1)
-        else:
-            print("ChatEngine: Initializing ChatOllama (Fallback)")
-            return ChatOllama(
-                model=os.getenv("OLLAMA_MODEL", "llama3"),
-                base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"),
-                temperature=0.1
-            )
+
+        print("ChatEngine: Initializing ChatOllama (Fallback)")
+        return ChatOllama(
+            model=os.getenv("OLLAMA_MODEL", "llama3"),
+            base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"),
+            temperature=0.1
+        )
 
     def _get_embeddings(self):
         return HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
